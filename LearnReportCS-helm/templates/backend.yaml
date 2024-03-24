@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.deployments.backendName }}
+  labels:
+    app: {{ .Values.deployments.backendName }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.deployments.backendName }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.deployments.backendName }}
+    spec:
+      containers:
+        - name: {{ .Values.deployments.backendName }}
+          image: "{{ .Values.images.backend.image }}:{{ .Values.images.backend.tag }}"
+          ports:
+            - containerPort: {{ .Values.images.backend.port }}
+              name: backend-port
+          imagePullPolicy: {{ .Values.imagePull }}

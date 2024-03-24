@@ -1,0 +1,25 @@
+deployments:
+  frontendName: frontend
+  backendName: backend
+  mongoName: mongodb
+
+services:
+  frontendName: frontend
+  backendName: backend
+  mongoName: mongodb
+
+images:
+  frontend: 
+    image: narsss1234/learner-report-cs-frontend
+    tag: latest
+    port: 3000
+  backend: 
+    image: narsss1234/learner-report-cs-backend
+    tag: latest
+    port: 4200
+  mongodb:
+    image: mongo
+    tag: latest
+    port: 27017
+
+imagePull: Always
