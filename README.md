@@ -77,8 +77,8 @@ docker push narsss1234/learner-report-cs-backend:latest
 6. change dir to LearnerReportCS-kube-files
 
 ```
-touch frontend.yaml
-touch frontend-svc.yaml
+touch backend.yaml
+touch backend-svc.yaml
 ```
 
 7. Update the deployment
@@ -99,4 +99,83 @@ we can test this on the ec2 public url - at port 4200, we will see the backend e
 ```
 
 ### Frontend Deployment
+
+1. As per the react-readme.md, the app will run on port 3000 by default
+
+
+2. Correct the dockerfile
+
+Navigate to Docker file
+
+```
+EXPOSE 3000
+
+As the frontend will be listening on this, so will the container image
+```
+
+3. Build the docker image
+
+```
+docker build -t narsss1234/learner-report-cs-frontend:latest .
+```
+
+4. Push the image to dockerhub
+
+```
+docker push narsss1234/learner-report-cs-frontend:latest
+```
+
+5. change dir to LearnerReportCS-kube-files
+
+```
+touch frontend.yaml
+touch frontend-svc.yaml
+```
+
+6. Update the deployment
+
+```
+Replicas - 1 is enough for now as this is dev environment
+Set the image as narsss1234/learner-report-cs-frontend:latest
+Added imagePullPolicy to Always
+
+```
+
+7. Update the Service
+
+```
+Exposed backend service on Load Balancer
+
+we can test this on the load balancer url - at port 3000, we will see the backend exposed
+```
+
+
+### Creatng Helm charts for the project
+
+1. Create a Helm folder, with all the default files
+
+```
+helm create LearnerReportCS-helm
+```
+
+2. Copy all the manifest files to templates folder inside the helm folder
+
+3. Create all the values in values.yaml file 
+
+4. Replace the values in manifest files with 
+
+```
+{{ .Values.<value> }}
+```
+
+5. install the helm chart
+
+```
+helm install learner-report-cs-app LearnerReportCS-helm --values LearnerReportCS-helm/values.yaml
+```
+
+6. This will deploy the Stack with versioning.
+
+
+### Stich this all and automate using Jenkins
 
