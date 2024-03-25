@@ -18,7 +18,7 @@ pipeline{
         stage('Build the Frontend'){
             steps{
                 script{
-                    sh "cd learnerReportCS_frontend && docker build -t ${env.REPO}/${env.FRONTEND}:${env.TAG} ."
+                    docker.build(${env.REPO}/${env.FRONTEND}:${env.TAG}, "-f learnerReportCS_frontend .")
                 }
             }
         }
