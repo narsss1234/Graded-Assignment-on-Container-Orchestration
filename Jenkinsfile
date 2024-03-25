@@ -26,7 +26,7 @@ pipeline{
         stage('Build the Backend'){
             steps{
                 script{
-                    sh "cd learnerReportCS_backend && docker build -t ${env.REPO}/${env.BACKEND}:${env.TAG} ."
+                    docker.build(${env.REPO}/${env.BACKEND}, "-f learnerReportCS_backend .")
                 }
             }
         }
@@ -34,8 +34,7 @@ pipeline{
         stage('Push the image to the public repo'){
             steps{
                 script{
-                    sh "docker push ${env.REPO}/${env.FRONTEND}:${env.TAG}"
-                    sh "docker push ${env.REPO}/${env.BACKEND}:${env.TAG}"
+                    sh "echo progressing"
                 }
             }
         }
