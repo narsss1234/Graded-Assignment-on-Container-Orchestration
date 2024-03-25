@@ -11,7 +11,7 @@ pipeline{
     stages{
         stage('Fetch the code'){
             steps{
-                git branch: 'main', url: 'https://github.com/CharismaticOwl/Test-LearnerReportCS.git'
+                git branch: 'main', url: 'https://github.com/CharismaticOwl/Graded-Assignment-on-Container-Orchestration.git'
             }
         }
 
