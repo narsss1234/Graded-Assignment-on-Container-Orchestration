@@ -11,14 +11,14 @@ pipeline{
     stages{
         stage('Fetch the code'){
             steps{
-                git branch: 'main', url: 'https://github.com/CharismaticOwl/Graded-Assignment-on-Container-Orchestration.git'
+                git branch:'main', url: 'https://github.com/CharismaticOwl/Graded-Assignment-on-Container-Orchestration.git'
             }
         }
 
         stage('Build the Frontend'){
             steps{
                 script{
-                    docker.build(${env.REPO}/${env.FRONTEND}, "-f learnerReportCS_frontend .")
+                    sh "cd learnerReportCS_frontend && docker build -t ${env.REPO}/${env.FRONTEND}:${env.TAG} ."
                 }
             }
         }
@@ -26,7 +26,7 @@ pipeline{
         stage('Build the Backend'){
             steps{
                 script{
-                    docker.build(${env.REPO}/${env.BACKEND}, "-f learnerReportCS_backend .")
+                    sh "cd learnerReportCS_backend && docker build -t ${env.REPO}/${env.BACKEND}:${env.TAG} ."
                 }
             }
         }
