@@ -36,7 +36,8 @@ pipeline{
         stage('Push the image to the public repo'){
             steps{
                 script{
-                    sh "echo progressing"
+                    sh "docker push ${env.REPO}/${env.FRONTEND}:${env.TAG}"
+                    sh "docker push ${env.REPO}/${env.BACKEND}:${env.TAG}"
                 }
             }
         }
