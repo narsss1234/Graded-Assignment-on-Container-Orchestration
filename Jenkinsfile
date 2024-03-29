@@ -36,8 +36,11 @@ pipeline{
         stage('Push the image to the public repo'){
             steps{
                 script{
-                    sh "docker push ${env.REPO}/${env.FRONTEND}:${env.TAG}"
-                    sh "docker push ${env.REPO}/${env.BACKEND}:${env.TAG}"
+                    withCredentials([usernamePassword(credentialsId: 'docker', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUser')]) {
+                        sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPassword}"
+                        sh "docker push ${env.REPO}/${env.FRONTEND}:${env.TAG}"
+                        sh "docker push ${env.REPO}/${env.BACKEND}:${env.TAG}"
+                    }
                 }
             }
         }
