@@ -48,7 +48,7 @@ pipeline{
         stage('update the EKS cluster'){
             steps{
                 script{
-                    echo 'workinprogress'
+                    sh "aws eks update-kubeconfig --name LearnerReportCS --region ap-south-1"
                 }
             }
         }
