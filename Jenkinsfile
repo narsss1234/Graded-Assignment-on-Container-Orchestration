@@ -2,7 +2,7 @@ pipeline{
     agent any
 
     environment{
-        REPO = 'narssss1234'
+        REPO = 'narsss1234'
         FRONTEND = 'learner-report-cs-frontend'
         BACKEND = 'learner-report-cs-backend'
         TAG = 'latest'
