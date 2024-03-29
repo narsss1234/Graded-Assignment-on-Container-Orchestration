@@ -177,5 +177,121 @@ helm install learner-report-cs-app LearnerReportCS-helm --values LearnerReportCS
 6. This will deploy the Stack with versioning.
 
 
-### Stich this all and automate using Jenkins
+### Stitch this all and automate using Jenkins
 
+1. Created Jenkinsfile
+
+```
+touch Jenkinsfile
+```
+
+2. Launched and ec3 instance with userdata to install Jenkins, docker, git, awscli,
+also attached an IAM role to the instance so that ec2 can access AWS resources.
+
+```
+#!/bin/bash
+sudo apt update --fix-missing
+sudo apt install awscli git fontconfig openjdk-17-jdk -y
+sudo wget -O /usr/share/keyrings/jenkins-keyring.asc \
+  https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
+  https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+  /etc/apt/sources.list.d/jenkins.list > /dev/null
+sudo apt-get update
+sudo apt-get install jenkins -y
+
+# Add Docker's official GPG key:
+sudo apt-get update
+sudo apt-get install ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+# Add the repository to Apt sources:
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
+
+sudo usermod -aG docker jenkins
+
+sudo systemctl restart jenkins
+```
+
+3. Once the ec2 is launched, you can access the jenkins on port 8080 and public IP address for ec2
+
+4. Go to Manage Jenkins, install all the plugins
+
+```
+git
+docker plugin
+AWS Credentials plugin
+Kubernetes plugin
+AWS :ECR plugin
+```
+
+5. Add global credentials
+
+```
+AWS Credentials -> to access aws resources
+Docker login 
+```
+
+5. installed kubectl, eksctl to be able to launch and configure EKS clusters
+
+6. Created a pipeline to be able to automate the build and deployment process, ensuring consistency and efficiency.
+
+7. Stage 1 to fetch the code
+
+```
+stage('Fetch the code'){
+            steps{
+                script{
+                    git branch:'main', url: 'https://github.com/CharismaticOwl/Graded-Assignment-on-Container-Orchestration.git'
+                }
+            }
+        }
+```
+
+8. Stage 2,3 to build the docker images
+
+```
+docker build -t ${env.REPO}/${env.FRONTEND}:${env.TAG} .
+```
+
+9. Stage 4, push the code to dockerhub
+
+```
+steps{
+                script{
+                    withCredentials([usernamePassword(credentialsId: 'docker', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUser')]) {
+                        sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPassword}"
+                        sh "docker push ${env.REPO}/${env.FRONTEND}:${env.TAG}"
+                        sh "docker push ${env.REPO}/${env.BACKEND}:${env.TAG}"
+                    }
+                }
+            }
+```
+
+10. Stage 5, to create a cluster if none exists, and if it already exists then simply update the deployment with helm install
+
+```
+steps{
+                script{
+                    def ClusterStatus = sh(script:"eksctl get cluster --name LearnerReportCSclusterNEW --region ap-south-1", returnStatus:true)
+                    if (ClusterStatus != 0){
+                        sh "Cluster does not exits creating one."
+                        sh "eksctl create cluster --name LearnerReportCSclusterNEW --region ap-south-1"
+                        sh "aws eks update-kubeconfig --name LearnerReportCSclusterNEW --region ap-south-1"
+                        sh "helm upgrade --install LearnReportCS-app LearnerReportCS-helm"
+                    } else{
+                        sh "echo 'Cluster exits, moving on with deployment.'"
+                        sh "aws eks update-kubeconfig --name LearnerReportCSclusterNEW --region ap-south-1"
+                        sh "helm upgrade --install LearnReportCS-app LearnerReportCS-helm"
+                    }
+                }
+            }
+```
