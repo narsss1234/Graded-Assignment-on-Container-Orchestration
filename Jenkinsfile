@@ -71,7 +71,7 @@ pipeline{
                         echo "Cluster exists, moving on with deployment."
                     }
                     sh "aws eks update-kubeconfig --name LearnerReportCSclusterNEW --region ap-south-1"
-                    sh "helm upgrade --install LearnReportCS-app LearnerReportCS-helm"
+                    // sh "helm upgrade --install learnreportcs LearnerReportCS-helm"
                 }
             }
         }
