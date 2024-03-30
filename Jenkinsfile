@@ -60,20 +60,18 @@ pipeline{
             }
         }
 
-        stage('update the EKS cluster'){
-            steps{
-                script{
-                    def ClusterStatus = sh(script:"eksctl get cluster --name LearnerReportCSclusterNEW --region ap-south-1", returnStatus:true)
-                    if (ClusterStatus != 0){
-                        sh "Cluster does not exits creating one."
+        stage('Update the EKS cluster') {
+            steps {
+                script {
+                    def clusterStatus = sh(script: "eksctl get cluster --name LearnerReportCSclusterNEW --region ap-south-1", returnStatus: true)
+                    if (clusterStatus != 0) {
+                        echo "Cluster does not exist, creating one."
                         sh "eksctl create cluster --name LearnerReportCSclusterNEW --region ap-south-1"
-                        sh "aws eks update-kubeconfig --name LearnerReportCSclusterNEW --region ap-south-1"
-                        sh "helm upgrade --install LearnReportCS-app LearnerReportCS-helm"
-                    } else{
-                        sh "echo 'Cluster exits, moving on with deployment.'"
-                        sh "aws eks update-kubeconfig --name LearnerReportCSclusterNEW --region ap-south-1"
-                        sh "helm upgrade --install LearnReportCS-app LearnerReportCS-helm"
+                    } else {
+                        echo "Cluster exists, moving on with deployment."
                     }
+                    sh "aws eks update-kubeconfig --name LearnerReportCSclusterNEW --region ap-south-1"
+                    sh "helm upgrade --install LearnReportCS-app LearnerReportCS-helm"
                 }
             }
         }
